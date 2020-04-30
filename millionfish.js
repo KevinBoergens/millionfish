@@ -19,6 +19,9 @@ class Term {
     } else {
       this.c = syntax
     }
+    if (this.c === undefined) {
+      this.c = []
+    }
   }
 
   toSyntax () {
@@ -298,4 +301,30 @@ const sel_paste = function (gsh) {
   if (!window.myclipboard || window.myclipboard.length === 0) return
   gsh.engine.insert_nodes(window.myclipboard, true)
   gsh.engine.checkpoint()
+}
+
+const exp1 = function (term, todo) {
+  if (term.op !== '*') {
+    return false
+  }
+  const stor = new Term()
+  stor.op = 'exponential'
+  stor.c[0] = todo.clone()
+  stor.c[1] = new Term()
+  stor.c[1].op = '+'
+  for (let idx = 0; idx < 2; idx++) {
+    if (compare(term.c[idx], todo)) {
+      stor.c[1].c[idx] = one
+      continue
+    }
+    if (term.c[idx].op === 'exponential') {
+      if (compare(term.c[idx].c[0], todo)) {
+        stor.c[1].c[idx] = term.c[idx].c[1]
+        continue
+      }
+    }
+    return false
+  }
+  term.copyFrom(stor)
+  return true
 }
