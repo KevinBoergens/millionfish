@@ -1,156 +1,32 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
     <link rel="stylesheet" href="https://guppy.js.org/build/guppy-default.min.css">
     <script type="text/javascript" src="https://guppy.js.org/build/guppy.js"></script>
-    <script type="text/javascript">
-        window.onload = function(){
-            counter = 0;
-            gs = []
-            gs[counter] = new Guppy("guppy" + counter);
-            gsm = new Guppy("guppym");
-            gsn = new Guppy("guppyn");
-        }
-        addnew = function(){
-            var tag = document.createElement("div");
-            counter++;
-            tag.id ="guppy"+counter;
-
-            var element = document.getElementById("new");
-            element.appendChild(tag);
-            gs[counter] = new Guppy("guppy" + counter);
-            temp = gs[counter-1].engine.get_content('ast');
-            temp2 = JSON.parse(temp);
-            gs[counter].import_syntax_tree(temp2);
-        }
-        deletelast = function(){
-            if (counter === 0)
-                return;
-            var element = document.getElementById("guppy" + counter);
-            element.parentNode.removeChild(element);
-            gs[counter] = null;
-            counter --;
-        }
-        compare = function(a,b) {
-            if (!Array.isArray(a)) {
-                return a===b;
-            }
-            if (a.length !== b.length) {
-                return false;
-            }
-            for (var idx = 0; idx<a.length;idx++) {
-                if (!compare(a[idx],b[idx])) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        findtimes = function(sh, preidx) {
-
-            for (var idx = 0; idx < 1+(sh[preidx][0]=='*'); idx++) {
-                if (compare(sh[preidx][1][idx], todo)) {
-                    if (sh[preidx][0]=='*'){
-                    sh[preidx] = sh[preidx][1][1-idx];
-                    } else {
-                        sh[preidx][1][idx]=['val',[1]];
-                    }
-
-                    return true;
-                }
-                if (sh[preidx][1][idx][0] ==  '*' || sh[preidx][1][idx][0] ==  'fraction') {
-                    if (findtimes(sh[preidx][1], idx))
-                        return true;
-                }
-            }
-            return false
-        }
-        factoroutin = function(sh){
-
-                if (!(sh[0]=='+' || sh[0]=='-'|| sh[0]=='neg')){
-                    return false;
-                }
-                for (var idx = 0; idx<sh[1].length; idx++) {
-                    if (compare(sh[1][idx], todo)) {
-                        sh[1][idx]=['val',[1]];
-                        continue;
-                    }
-                    if (sh[1][idx][0]== '+' || sh[1][idx][0] ==  '-'|| sh[1][idx][0] ==  'neg') {
-                        if (!factoroutin(sh[1][idx])) {
-                            return false;
-                        }
-                        continue;
-                    }
-                    if (sh[1][idx][0] == '*' || sh[1][idx][0] == 'fraction') {
-                        if (!findtimes(sh[1],idx)) {
-                            return false;
-                        }
-                        continue;
-
-                    }
-
-                    return false;
-
-
-                }
-            return true;
-
-        }
-
-        extendfraction = function(){
-            sel_start = gs[counter].engine.sel_start;
-            sel_end = gs[counter].engine.sel_end;
-            sel_status = gs[counter].engine.sel_status;
-            gs[counter].engine.sel_copy();
-
-            gsn.engine.set_content('');
-            gsn.engine.sel_paste();
-            syntax = eval(gsn.engine.get_content('ast'));
-            todo = eval(gsm.engine.get_content('ast'));
-
-            if (factoroutin(syntax)) {
-                temp3 = ['*',[todo, syntax]];
-                gsn.import_syntax_tree(temp3);
-                gsn.engine.sel_all();
-                gsn.engine.sel_copy();
-                gs[counter].engine.sel_start = sel_start;
-                gs[counter].engine.sel_end = sel_end;
-                gs[counter].engine.sel_status = sel_status;
-                gs[counter].engine.sel_paste();
-            }
-        }
-        factorout = function(){
-            sel_start = gs[counter].engine.sel_start;
-            sel_end = gs[counter].engine.sel_end;
-            sel_status = gs[counter].engine.sel_status;
-            gs[counter].engine.sel_copy();
-
-            gsn.engine.set_content('');
-            gsn.engine.sel_paste();
-            syntax = eval(gsn.engine.get_content('ast'));
-            todo = eval(gsm.engine.get_content('ast'));
-            if (factoroutin(syntax)) {
-                temp3 = ['*',[todo, syntax]];
-                gsn.import_syntax_tree(temp3);
-                gsn.engine.sel_all();
-                gsn.engine.sel_copy();
-                gs[counter].engine.sel_start = sel_start;
-                gs[counter].engine.sel_end = sel_end;
-                gs[counter].engine.sel_status = sel_status;
-                gs[counter].engine.sel_paste();
-            }
-        }
-    </script>
+    <script type="text/javascript" src="./millionfish.js"></script>
+    <title>millionfish</title>
 </head>
 <body>
-<div id="guppyn"></div>
-<div id="guppym"></div>
+<div id="new">
+    <div id="guppy0"></div>
+</div>
+
+<button onclick="downloadHere()">Save</button>
+
+
 <button onclick="addnew()">copy</button>
 <button onclick="deletelast()">delete</button>
-<button onclick="factorout()">factor out</button>
-<button onclick="extendfraction()">extend fraction</button>
+<button onclick="helpermain(factorout)">Xa+Xb => X(a+b)</button>
+<button onclick="helpermain(extendfraction)">a/b => Xa/Xb</button>
+<button onclick="helpermain(shortfraction)">Xa/Xb => a/b</button>
+<button onclick="helpermain((syntax, todo) => expandleftright(syntax, todo, 0))">(a+b)c => ac+bc</button>
+<button onclick="helpermain((syntax, todo) => expandleftright(syntax, todo, 1))">a(b+c) => ab+ac</button>
+<button onclick="helpermain(pullin)">a(b/c) => (ab)/c</button>
 
-<div id="new">
-<div id="guppy0"></div>
-</div>
+
+    <input type="file" id="fileinput" accept=".txt"/>
+<div id="guppyn" style="display:none"></div>
+<div id="guppym"></div>
+<div id="guppyo" style="display:none"></div>
 </body>
 </html>
