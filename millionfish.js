@@ -226,8 +226,8 @@ const pullin = function (term, todo) {
 const shortfraction = function (term, todo) {
   if (term.op === 'fraction') {
     const rv = findtimes(term.c[0], todo) && findtimes(term.c[1], todo)
-    if (compare(term.c[0], one) && compare(term.c[1], one)) {
-      term.copyFrom(one)
+    if (compare(term.c[1], one)) {
+      term.copyFrom(term.c[0])
     }
     return rv;
   } else {
