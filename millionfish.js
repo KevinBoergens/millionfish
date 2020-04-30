@@ -150,7 +150,7 @@ const findtimes = function (term, todo) {
       if (term.op === '*') {
         term.copyFrom(term.c[1 - idx])
       } else {
-        term.copyFrom(one)
+        term.c[idx] = one
       }
       return true
     }
