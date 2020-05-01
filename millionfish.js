@@ -165,7 +165,7 @@ const findtimes = function (term, todo) {
   return false
 }
 
-const factorout = function (term, todo) {
+const factoroutin = function (term, todo) {
   if (!(term.op === '+' || term.op === '-' || term.op === 'neg')) {
     return false
   }
@@ -180,8 +180,18 @@ const factorout = function (term, todo) {
       }
       continue
     }
-    if (!factorout(term.c[idx], todo)) { return false }
+    if (!factoroutin(term.c[idx], todo)) { return false }
   }
+  return true
+}
+
+const factorout = function (term, todo) {
+  if (!factoroutin(term, todo)) {
+    return false
+  }
+  term.c[1].copyFrom(term)
+  term.c[0].copyFrom(todo)
+  term.op = '*'
   return true
 }
 
