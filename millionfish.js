@@ -216,13 +216,25 @@ const extendfraction = function (term, todo) {
 }
 
 const pullin = function (term, todo) {
-  if (term.op === '*' && term.c[1].op === 'fraction') {
-    term.op = 'fraction'
-    term.c[0] = createmult(term.c[0], term.c[1].c[0])
-    term.c[1].copyFrom(term.c[1].c[1])
-    return true
+  if (term.op !== '*') {
+    return false
   }
-  return false
+  if (term.c[0].op !== 'fraction' && term.c[1].op !== 'fraction') {
+    return false
+  }
+  let stor = new Term();
+  stor.op = 'fraction'
+  stor.c = [one, one]
+  for (let idx = 0; idx < 2; idx++) {
+    if (term.c[idx].op === 'fraction') {
+      stor.c[0] = createmult(stor.c[0], term.c[idx].c[0])
+      stor.c[1] = createmult(stor.c[1], term.c[idx].c[1])
+      continue
+    }
+    stor.c[0] = createmult(stor.c[0], term.c[idx])
+  }
+  term.copyFrom(stor)
+  return true
 }
 
 const shortfraction = function (term, todo) {
