@@ -328,3 +328,13 @@ const exp1 = function (term, todo) {
   term.copyFrom(stor)
   return true
 }
+
+const swap = function (term, todo) {
+  if (term.op === '*' || term.op === '+') {
+    const temp = term.c[0]
+    term.c[0] = term.c[1].clone()
+    term.c[1] = temp.clone()
+    return true
+  }
+  return false
+}
