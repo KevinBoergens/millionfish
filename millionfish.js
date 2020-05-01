@@ -48,7 +48,6 @@ class Term {
 
 const one = new Term(['val', [1]])
 
-
 const addnew = function () {
   const tag = document.createElement('div')
   window.counter++
@@ -129,7 +128,7 @@ const helpermain = function (fun) {
     window.gso.engine.end()
     window.gso.engine.backspace()
     window.gso.engine.backspace()
-    window.gso.engine.sel_all();
+    window.gso.engine.sel_all()
     sel_copy(window.gso)
     window.gs[window.counter].engine.sel_start = selStart
     window.gs[window.counter].engine.sel_end = selEnd
@@ -232,7 +231,7 @@ const shortfraction = function (term, todo) {
     if (compare(term.c[1], one)) {
       term.copyFrom(term.c[0])
     }
-    return rv;
+    return rv
   } else {
     return false
   }
@@ -337,4 +336,19 @@ const swap = function (term, todo) {
     return true
   }
   return false
+}
+
+const calc = function (term, todo) {
+  try {
+    const value = window.gsn.func()()
+    for (let idx = 0; idx < 3; idx++) {
+      if (Math.pow(10, idx) * value === Math.round(Math.pow(10, idx) * value)) {
+        term.copyFrom(new Term(['val', [Math.round(Math.pow(10, idx) * value) / Math.pow(10, idx)]]))
+        return true
+      }
+    }
+    return false
+  } catch (e) {
+    return false
+  }
 }
